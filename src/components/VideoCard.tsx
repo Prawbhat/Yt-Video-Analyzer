@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { Eye, ThumbsUp, MessageCircle, Calendar, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Eye, ThumbsUp, MessageCircle, Calendar, ExternalLink, Clock } from "lucide-react";
 
 interface VideoCardProps {
   id: string;
@@ -10,6 +11,8 @@ interface VideoCardProps {
   uploadDate: string;
   thumbnail: string;
   url: string;
+  duration: string;
+  contentType: 'Short Form' | 'Long Form';
 }
 
 export const VideoCard = ({
@@ -20,6 +23,8 @@ export const VideoCard = ({
   uploadDate,
   thumbnail,
   url,
+  duration,
+  contentType,
 }: VideoCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
@@ -30,6 +35,16 @@ export const VideoCard = ({
             alt={title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          <Badge 
+            variant={contentType === 'Short Form' ? 'destructive' : 'secondary'}
+            className="absolute bottom-2 right-2 font-semibold"
+          >
+            {contentType}
+          </Badge>
+          <div className="absolute bottom-2 left-2 bg-black/80 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {duration}
+          </div>
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
             <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>

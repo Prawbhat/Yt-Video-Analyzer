@@ -14,6 +14,32 @@ interface VideoData {
   uploadDate: string;
   thumbnail: string;
   url: string;
+  duration: string;
+  contentType: 'Short Form' | 'Long Form';
+}
+
+// Parse ISO 8601 duration format (PT1M30S) to seconds
+function parseDuration(duration: string): number {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  
+  const hours = parseInt(match[1] || '0');
+  const minutes = parseInt(match[2] || '0');
+  const seconds = parseInt(match[3] || '0');
+  
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+// Format seconds to readable duration
+function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
 serve(async (req) => {
@@ -123,13 +149,16 @@ serve(async (req) => {
       // Get video IDs for this batch
       const videoIds = playlistData.items.map((item: any) => item.snippet.resourceId.videoId);
       
-      // Fetch detailed statistics for these videos
-      const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=${videoIds.join(',')}&key=${API_KEY}`;
+      // Fetch detailed statistics and content details for these videos
+      const statsUrl = `https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,contentDetails&id=${videoIds.join(',')}&key=${API_KEY}`;
       const statsResponse = await fetch(statsUrl);
       const statsData = await statsResponse.json();
 
       // Combine the data
       statsData.items.forEach((video: any) => {
+        const durationInSeconds = parseDuration(video.contentDetails.duration);
+        const isShortForm = durationInSeconds < 60;
+        
         videos.push({
           id: video.id,
           title: video.snippet.title,
@@ -142,7 +171,9 @@ serve(async (req) => {
             day: 'numeric'
           }),
           thumbnail: video.snippet.thumbnails.medium.url,
-          url: `https://www.youtube.com/watch?v=${video.id}`
+          url: `https://www.youtube.com/watch?v=${video.id}`,
+          duration: formatDuration(durationInSeconds),
+          contentType: isShortForm ? 'Short Form' : 'Long Form'
         });
       });
 

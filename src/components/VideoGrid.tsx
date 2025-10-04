@@ -12,6 +12,8 @@ interface Video {
   uploadDate: string;
   thumbnail: string;
   url: string;
+  duration: string;
+  contentType: 'Short Form' | 'Long Form';
 }
 
 interface VideoGridProps {
@@ -22,6 +24,8 @@ export const VideoGrid = ({ videos }: VideoGridProps) => {
   const handleDownloadExcel = () => {
     const worksheetData = videos.map((video) => ({
       Title: video.title,
+      "Content Type": video.contentType,
+      Duration: video.duration,
       Views: video.views,
       Likes: video.likes,
       Comments: video.comments,

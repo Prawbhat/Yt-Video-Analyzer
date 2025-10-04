@@ -15,6 +15,8 @@ interface Video {
   uploadDate: string;
   thumbnail: string;
   url: string;
+  duration: string;
+  contentType: 'Short Form' | 'Long Form';
 }
 
 const Index = () => {
