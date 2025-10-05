@@ -17,6 +17,9 @@ interface Video {
   url: string;
   duration: string;
   contentType: 'Short Form' | 'Long Form';
+  tags: string[];
+  hashtags: string[];
+  hasCaption: boolean;
 }
 
 const Index = () => {

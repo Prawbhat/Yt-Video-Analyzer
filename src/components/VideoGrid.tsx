@@ -14,6 +14,9 @@ interface Video {
   url: string;
   duration: string;
   contentType: 'Short Form' | 'Long Form';
+  tags: string[];
+  hashtags: string[];
+  hasCaption: boolean;
 }
 
 interface VideoGridProps {
@@ -30,6 +33,9 @@ export const VideoGrid = ({ videos }: VideoGridProps) => {
       Likes: video.likes,
       Comments: video.comments,
       "Upload Date": video.uploadDate,
+      Tags: video.tags.join(", "),
+      Hashtags: video.hashtags.map(h => `#${h}`).join(", "),
+      "Has Captions": video.hasCaption ? "Yes" : "No",
       URL: video.url,
     }));
 

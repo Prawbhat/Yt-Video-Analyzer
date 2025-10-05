@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye, ThumbsUp, MessageCircle, Calendar, ExternalLink, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Eye, ThumbsUp, MessageCircle, Calendar, ExternalLink, Clock, Tag, Hash, FileText } from "lucide-react";
+import { toast } from "sonner";
 
 interface VideoCardProps {
   id: string;
@@ -13,9 +15,13 @@ interface VideoCardProps {
   url: string;
   duration: string;
   contentType: 'Short Form' | 'Long Form';
+  tags: string[];
+  hashtags: string[];
+  hasCaption: boolean;
 }
 
 export const VideoCard = ({
+  id,
   title,
   views,
   likes,
@@ -25,7 +31,13 @@ export const VideoCard = ({
   url,
   duration,
   contentType,
+  tags,
+  hashtags,
+  hasCaption,
 }: VideoCardProps) => {
+  const handleTranscriptRequest = () => {
+    toast.info("YouTube API limits caption downloads to OAuth-authenticated apps. You can view captions directly on YouTube by clicking the video link.");
+  };
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
       <a href={url} target="_blank" rel="noopener noreferrer" className="block">
@@ -71,6 +83,61 @@ export const VideoCard = ({
               <span>{uploadDate}</span>
             </div>
           </div>
+          
+          {(tags.length > 0 || hashtags.length > 0) && (
+            <div className="space-y-2">
+              {tags.length > 0 && (
+                <div className="flex items-start gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex flex-wrap gap-1">
+                    {tags.slice(0, 3).map((tag, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {hashtags.length > 0 && (
+                <div className="flex items-start gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex flex-wrap gap-1">
+                    {hashtags.slice(0, 3).map((hashtag, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-xs">
+                        {hashtag}
+                      </Badge>
+                    ))}
+                    {hashtags.length > 3 && (
+                      <Badge variant="secondary" className="text-xs">
+                        +{hashtags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {hasCaption && (
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                handleTranscriptRequest();
+              }}
+              variant="outline"
+              size="sm"
+              className="w-full gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              View Transcript Info
+            </Button>
+          )}
         </div>
       </a>
     </Card>

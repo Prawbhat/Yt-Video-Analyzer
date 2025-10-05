@@ -16,6 +16,9 @@ interface VideoData {
   url: string;
   duration: string;
   contentType: 'Short Form' | 'Long Form';
+  tags: string[];
+  hashtags: string[];
+  hasCaption: boolean;
 }
 
 // Parse ISO 8601 duration format (PT1M30S) to seconds
@@ -159,6 +162,11 @@ serve(async (req) => {
         const durationInSeconds = parseDuration(video.contentDetails.duration);
         const isShortForm = durationInSeconds < 60;
         
+        // Extract tags and hashtags
+        const tags = video.snippet.tags || [];
+        const description = video.snippet.description || '';
+        const hashtags = (description.match(/#[\w]+/g) || []).map((tag: string) => tag.substring(1));
+        
         videos.push({
           id: video.id,
           title: video.snippet.title,
@@ -173,7 +181,10 @@ serve(async (req) => {
           thumbnail: video.snippet.thumbnails.medium.url,
           url: `https://www.youtube.com/watch?v=${video.id}`,
           duration: formatDuration(durationInSeconds),
-          contentType: isShortForm ? 'Short Form' : 'Long Form'
+          contentType: isShortForm ? 'Short Form' : 'Long Form',
+          tags: tags,
+          hashtags: hashtags,
+          hasCaption: video.contentDetails.caption === 'true'
         });
       });
 
